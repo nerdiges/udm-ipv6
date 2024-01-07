@@ -31,6 +31,25 @@ systemctl start sixinator.service
 ```
 
 ## Konfiguration
-Im Script kann über die Variable *exclude* eine Liste von Interfaces angegeben werden, bei denen der ausgehende Datenverkehr grundsätzlich zugelassen wird.
+Im Script kann über einige Variable das Verahlten angepasst werden:
 
-**Beispiel:** Wurden in der *Unifi Network* Oberfläche beispielsweise zwei Corporate-Network VLANs mit den VLAN-IDs 20 und 21, so werden von Unifi die Interfaces *br20* und *br21* angelegt. Wird in der Variablen *exclude* das Interface br20 angegeben so wird der Traffic *br20* -> *br21* grundsätzlich zugelassen. Dazu wird auch eine entsprechende Firewall Regel eingetragen, die das Connection-Tracking aktiviert und Pakete mit dem Status `established`und `related` zulässt (siehe auch variablen `allow_related_lan`und `allow_related_guest`).
+```
+# WAN-Interface to be checked
+wan_if="eth8 eth9"
+
+# IPv6 hosts used to test IPv6 connection
+host1="facebook.de"
+host2="google.de"
+host3="apple.com"
+host4="microsoft.com"
+
+# ULA prefix to be used
+ula_prefix="fd00:2:0:"
+
+# interfaces listed in exclude will not be assigned any IPv6 ULAs
+# Multiple interfaces are to be separated by spaces.
+exclude="br0"
+
+# set ULA on guest interfaces?
+guest_ula=false
+```
