@@ -31,7 +31,7 @@ systemctl start sixinator.service
 ```
 
 ## Konfiguration
-Im Script kann über einige Variable das Verahlten angepasst werden:
+Im Script kann über einige Variable das Verhalten angepasst werden:
 
 ```
 # WAN-Interface to be checked
