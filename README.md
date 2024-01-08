@@ -25,7 +25,6 @@ chmod +x /usr/local/bin/sixinator.sh
 wget -O /data/custom/sixinator/sixinator.service https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.service
 ln -s /data/custom/sixinator/sixinator.service /etc/systemd/system/sixinator.service
 
-
 # 3. Reload systemd, enable and start the service:
 systemctl daemon-reload
 systemctl enable sixinator.service
