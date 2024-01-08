@@ -3,7 +3,7 @@ Description=Sixinator - used on UDM Pro to configure IPv6-ULAs and to force a WA
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/sixinator.sh
+ExecStart=/data/custom/sixinator/sixinator.sh
 
 [Install]
 WantedBy=multi-user.target

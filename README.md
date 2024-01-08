@@ -17,12 +17,14 @@ Nachdem eine Verbindung per SSH zur UDM/UDM Pro hergestellt wurde wird das Scrip
 
 ```
 # 1. download file to directory /usr/local/bin/ and make script executable
-wget -O /usr/local/bin/sixinator.sh https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.sh
+mkdir -p /data/custom/sixinator
+wget -O /data/custom/sixinator/sixinator.sh https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.sh
 chmod +x /usr/local/bin/sixinator.sh
 
 # 2. Download and install sixinator.service definition file in /etc/systemd/system via:
-wget -O /etc/systemd/system/sixinator.service https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.service
-chmod 755 /etc/systemd/system/sixinator.service
+wget -O /data/custom/sixinator/sixinator.service https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.service
+ln -s /data/custom/sixinator/sixinator.service /etc/systemd/system/sixinator.service
+
 
 # 3. Reload systemd, enable and start the service:
 systemctl daemon-reload
