@@ -70,19 +70,38 @@ do
 	fi
 
 
-	# exit if ULAs already assigned
-	if ( ip -6 addr show | grep "$ula_prefix" ); then 
-		logger "$me: Found ULA prefixes. Nothing to do."
-	else 
-		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		# ULAs for LAN interfaces
-		#
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	# ULAs for LAN interfaces
+	#
 
-		# Get list of relevant LAN interfaces and total number of interfaces
-		lan_if=$(iptables --list-rules UBIOS_FORWARD_IN_USER | awk '/-j UBIOS_LAN_IN_USER/ { print $4 }')
+	# Get list of relevant LAN interfaces and total number of interfaces
+	lan_if=$(iptables --list-rules UBIOS_FORWARD_IN_USER | awk '/-j UBIOS_LAN_IN_USER/ { print $4 }')
+
+	# Add ULAs to all LAN interfaces except the ones listed in $exclude
+	for i in $lan_if; do
+		case "$exclude " in
+			*"$i "*)
+				logger "$me: Excluding $i from ULA assignment as requested in config."
+				;;
+
+			*)
+				ip -6 addr show dev $i | grep "$ula_prefix" &> /dev/null ||
+					ip -6 addr add "${ula_prefix}${i:2}::1/64" dev $i
+				;;
+		esac
+	done
+
+
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	# ULAs for guest interfaces
+	#
+
+	if [ $guest_ula == "true" ]; then
+		# Get list of relevant guest interfaces and total number of interfaces
+		guest_if=$(iptables --list-rules UBIOS_FORWARD_IN_USER | awk '/-j UBIOS_GUEST_IN_USER/ { print $4 }')
 
 		# Add ULAs to all LAN interfaces except the ones listed in $exclude
-		for i in $lan_if; do
+		for i in $guest_if; do
 			case "$exclude " in
 				*"$i "*)
 					logger "$me: Excluding $i from ULA assignment as requested in config."
@@ -94,32 +113,7 @@ do
 					;;
 			esac
 		done
-
-
-		#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		# ULAs for guest interfaces
-		#
-
-		if [ $guest_ula == "true" ]; then
-			# Get list of relevant guest interfaces and total number of interfaces
-			guest_if=$(iptables --list-rules UBIOS_FORWARD_IN_USER | awk '/-j UBIOS_GUEST_IN_USER/ { print $4 }')
-
-			# Add ULAs to all LAN interfaces except the ones listed in $exclude
-			for i in $guest_if; do
-				case "$exclude " in
-					*"$i "*)
-						logger "$me: Excluding $i from ULA assignment as requested in config."
-						;;
-
-					*)
-						ip -6 addr show dev $i | grep "$ula_prefix" &> /dev/null ||
-							ip -6 addr add "${ula_prefix}${i:2}::1/64" dev $i
-						;;
-				esac
-			done
-		fi
 	fi
-
 
 
     # sleep for one minute and then re-evaluate because changed in the 
