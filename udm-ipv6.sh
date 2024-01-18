@@ -50,6 +50,9 @@ exclude="br0"
 # set scriptname
 me=$(basename $0)
 
+# include local configuration if available
+[ -e ${me%.*}.conf ] && source ${me%.*}.conf
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # check ipv6 connection
 #

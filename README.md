@@ -72,6 +72,8 @@ exclude="br0"
 ######################################################################################
 ```
 
+Die Konfiguration kann auch in der Datei udm-wireguard.conf gespeichert werden, die bei einem Update nicht überschrieben wird.
+
 **3. Einrichten der systemd-Services**
 
 Ist auf der UDM-Pro auch das Script [udm-firewall](https://github.com/nerdiges/udm-firewall) installiert, kann dieser Schritt übersprungen werden, da das Script automatisch von [udm-firewall](https://github.com/nerdiges/udm-firewall) mit ausgeführt wird. Damit das funktioniert müssen sowohl das [udm-firewall](https://github.com/nerdiges/udm-firewall) als auch udm-ipv6, wie in den jeweiligen README.md beschrieben installiert wurden. 
