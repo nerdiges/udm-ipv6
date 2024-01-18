@@ -1,0 +1,11 @@
+[Unit]
+Description=Check IPv6 workarounds regularly.
+
+[Timer]
+OnBootSec=30sec
+OnUnitInactiveSec=90sec
+Persistent=true
+Unit=udm-ipv6.service
+
+[Install]
+WantedBy=timers.target

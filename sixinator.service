@@ -1,9 +1,0 @@
-[Unit]
-Description=Sixinator - used on UDM Pro to configure IPv6-ULAs and to force a WAN reset when IPv6 connection is lost due to dynamic IPv6 prefixes issued by internet provider
-After=network.target
-
-[Service]
-ExecStart=/data/custom/sixinator/sixinator.sh
-
-[Install]
-WantedBy=multi-user.target

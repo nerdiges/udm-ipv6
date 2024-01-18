@@ -1,40 +1,49 @@
 # sixinator
 IPv6 Workarounds für das UnifiOS der Ubiquiti Unifi Dream Machines Pro.
 
-Obwohl ein Marketing Slogan für Unifi "Building the Future of IT" ist, so haben die Unifi-Produkte leider noch einige Probleme mit IPv6 - auch noch in der Version 3.2.7. Eine Unique Local Address (ULA) kann beispielsweise immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, fände ich eine Option dafür in der GUI ganz nett.
+Unique Local Addresses (ULA) können auch in unifiOD 3.2.7 und in Network App 8.0.36 können immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
 
-Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jeder neuen IPv6-Prefix habe ich daher die IPv6-Verbindung verloren (siehe auch UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS 3.2.7 damit immer noch ein Problem hat. Daher gehe ich lieber auf Nummer sicher und möchte das Interface resetten, wenn die IPv6-Verbindung nicht mehr bestht. Damit konnte bisher das neue IPv6-Prefix im Netzwerk verteilt werden.
-
-## Funktionsweise
-Das Script `sixinator.sh` wird wie bei dem Script natanator von jadedeane (https://github.com/jadedeane/natanator) beim Systemstart per systemd ausgeführt. Da die von sixinator erzeugten IPv6-ULAs werden bei Änderungen an der Netzwerkkonfiguration über die GUI wieder gelöscht. Daher wird über den Service alle 60 Sekunden geprüft, ob die IPv6-ULAs noch existieren und ob sie ggf. neu hinzugefügt werden müssen. Außerdem wird überprüft ob die IPv6-Verbindung noch besteht und wenn nicht werden die WAN-Interfaces neu gestartet.
+Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jedem neuen IPv6-Prefix wurde das WAN interface nicht korrekt aktualisiert, so dass die IPv6-Verbindung verloren ging (siehe auch UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS 3.2.7 damit immer noch ein Problem hat. Um die IPv6 Verbindung nicht zu verlieren, wird regelmäßig überprüft ob die IPv6 Verbindung verloren geht. Falls ja, wird das WAN Interface resettet. Dadurch wird das neue IPv6-Prefix auch im Netzwerk verteilt und IPv6 sollte wieder funktionieren.
 
 ## Voraussetzungen
-Unifi Dream Machine Pro mit UnifiOS Version 3.x. Erfolgreich getestet mit UnifiOS 3.2.7
+Unifi Dream Machine Pro mit UnifiOS Version 3.x. Erfolgreich getestet mit UnifiOS 3.2.7 und Network App 8.0.26.
+
+## Funktionsweise
+Das Script `udm-ipv6.sh` wird bei jedem Systemstart und anschließend alle 90 Sekunden per systemd ausgeführt. Da die von Script erzeugten IPv6-ULAs bei Änderungen an der Netzwerkkonfiguration über die GUI wieder gelöscht werden, wird regelmäßig überprüft, ob die IPv6-ULAs noch passen. Neben dem systemd-Service wird daher auch ein systemd-Timer eingerichtet der das Script alle 90 Sekunden neu startet und die ULAs bei Bedarf wiederherstellt.
+
+## Features
+- Überprüfung der IPv6-Verbindung  
+- Vergabe von IPv6-ULAs für die konfigurierten Netzwerke 
+
+## Disclaimer
+Änderungen die dieses Script an der Konfiguration der UDM-Pro vornimmt, werden von Ubiquiti nicht offiziell unterstützt und können zu Fehlfunktionen oder Garantieverlust führen. Alle BAckup werden auf eigene Gefahr durchgeführt. Vor der Installation: Backup, Backup, Backup!!!
 
 
-## Installation des Scriptes
-Nachdem eine Verbindung per SSH zur UDM/UDM Pro hergestellt wurde wird das Script folgendermaßen installiert:
+## Installation
+Nachdem eine Verbindung per SSH zur UDM/UDM Pro hergestellt wurde wird udm-wireguard folgendermaßen installiert:
+
+**1. Download der Dateien**
 
 ```
-# 1. download file to directory /usr/local/bin/ and make script executable
-mkdir -p /data/custom/sixinator
-wget -O /data/custom/sixinator/sixinator.sh https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.sh
-chmod +x /usr/local/bin/sixinator.sh
-
-# 2. Download and install sixinator.service definition file in /etc/systemd/system via:
-wget -O /data/custom/sixinator/sixinator.service https://raw.githubusercontent.com/nerdiges/sixinator/main/sixinator.service
-ln -s /data/custom/sixinator/sixinator.service /etc/systemd/system/sixinator.service
-
-# 3. Reload systemd, enable and start the service:
-systemctl daemon-reload
-systemctl enable sixinator.service
-systemctl start sixinator.service
+mkdir -p /data/custom
+dpkg -l git || apt install git
+git clone https://github.com/nerdiges/udm-ipv6.git /data/custom/ipv6
+chmod +x /data/custom/ipv6/udm-ipv6.sh
 ```
 
-## Konfiguration
+**2. Parameter im Script anpassen (optional)**
+
 Im Script kann über einige Variable das Verhalten angepasst werden:
 
 ```
+######################################################################################
+#
+# Configuration
+#
+
+# check and try to restore IPv6 connection
+check_v6=true
+
 # WAN-Interface to be checked
 wan_if="eth8 eth9"
 
@@ -44,6 +53,12 @@ host2="google.de"
 host3="apple.com"
 host4="microsoft.com"
 
+# set ULA on lan interfaces?
+lan_ula=true
+
+# set ULA on guest interfaces?
+guest_ula=false
+
 # ULA prefix to be used
 ula_prefix="fd00:2:0:"
 
@@ -51,6 +66,29 @@ ula_prefix="fd00:2:0:"
 # Multiple interfaces are to be separated by spaces.
 exclude="br0"
 
-# set ULA on guest interfaces?
-guest_ula=false
+#
+# No further changes should be necessary beyond this line.
+#
+######################################################################################
 ```
+
+**3. Einrichten der systemd-Services**
+
+Ist auf der UDM-Pro auch das Script [udm-firewall](https://github.com/nerdiges/udm-firewall) installiert, kann dieser Schritt übersprungen werden, da das Script automatisch von [udm-firewall](https://github.com/nerdiges/udm-firewall) mit ausgeführt wird. Damit das funktioniert müssen sowohl das [udm-firewall](https://github.com/nerdiges/udm-firewall) als auch udm-ipv6, wie in den jeweiligen README.md beschrieben installiert wurden. 
+
+```
+# Install udm-ipv6.service und timer definition file in /etc/systemd/system via:
+ln -s /data/custom/ipv6/udm-ipv6.service /etc/systemd/system/udm-ipv6.service
+ln -s /data/custom/ipv6/udm-ipv6.timer /etc/systemd/system/udm-ipv6.timer
+
+# Reload systemd, enable and start the service and timer:
+systemctl daemon-reload
+systemctl enable udm-ipv6.service
+systemctl start udm-ipv6.service
+systemctl enable udm-ipv6.timer
+systemctl start udm-ipv6.timer
+
+# check status of service and timer
+systemctl status udm-ipv6.timer udm-ipv6.service
+```
+

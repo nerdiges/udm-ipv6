@@ -1,0 +1,9 @@
+[Unit]
+Description=udm-ipv6 - configure IPv6-ULAs and force WAN reset when IPv6 connection is lost due to dynamic IPv6 prefixes.
+After=network.target
+
+[Service]
+ExecStart=/data/custom/ipv6/udm-ipv6.sh
+
+[Install]
+WantedBy=multi-user.target
