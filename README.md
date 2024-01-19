@@ -1,4 +1,4 @@
-# sixinator
+# udm-ipv6
 IPv6 Workarounds für das UnifiOS der Ubiquiti Unifi Dream Machines Pro.
 
 Unique Local Addresses (ULA) können auch in unifiOS 3.2.7 und in Network App 8.0.36 können immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
@@ -43,9 +43,6 @@ Im Script kann über einige Variable das Verhalten angepasst werden:
 
 # check and try to restore IPv6 connection
 check_v6=true
-
-# WAN-Interface to be checked
-wan_if="eth8 eth9"
 
 # IPv6 hosts used to test IPv6 connection
 host1="facebook.de"

@@ -20,9 +20,6 @@
 # check and try to restore IPv6 connection
 check_v6=true
 
-# WAN-Interface to be checked
-wan_if="eth8 eth9"
-
 # IPv6 hosts used to test IPv6 connection
 host1="facebook.de"
 host2="google.de"
@@ -52,6 +49,9 @@ me=$(basename $0)
 
 # include local configuration if available
 [ -e "$(dirname $0)/${me%.*}.conf" ] && source "$(dirname $0)/${me%.*}.conf"
+
+# Get list of WAN interfacess
+wan_if=$(/usr/sbin/iptables --list-rules | /usr/bin/awk '/^-A UBIOS_FORWARD_IN_USER.*-j UBIOS_WAN_IN_USER/ { print $4 }')
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # check ipv6 connection
