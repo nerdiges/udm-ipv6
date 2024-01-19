@@ -1,9 +1,9 @@
 # sixinator
 IPv6 Workarounds für das UnifiOS der Ubiquiti Unifi Dream Machines Pro.
 
-Unique Local Addresses (ULA) können auch in unifiOD 3.2.7 und in Network App 8.0.36 können immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
+Unique Local Addresses (ULA) können auch in unifiOS 3.2.7 und in Network App 8.0.36 können immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
 
-Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jedem neuen IPv6-Prefix wurde das WAN interface nicht korrekt aktualisiert, so dass die IPv6-Verbindung verloren ging (siehe auch UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS 3.2.7 damit immer noch ein Problem hat. Um die IPv6 Verbindung nicht zu verlieren, wird regelmäßig überprüft ob die IPv6 Verbindung verloren geht. Falls ja, wird das WAN Interface resettet. Dadurch wird das neue IPv6-Prefix auch im Netzwerk verteilt und IPv6 sollte wieder funktionieren.
+Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jedem neuen IPv6-Prefix wurde das WAN interface nicht korrekt aktualisiert, so dass die IPv6-Verbindung verloren ging (siehe auch [UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe](https://nerdig.es/udm-pro-ipv6-2/)). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS 3.2.7 damit immer noch ein Problem hat. Um die IPv6 Verbindung nicht zu verlieren, wird regelmäßig überprüft ob die IPv6 Verbindung verloren geht. Falls ja, wird das WAN Interface resettet. Dadurch wird das neue IPv6-Prefix auch im Netzwerk verteilt und IPv6 sollte wieder funktionieren.
 
 ## Voraussetzungen
 Unifi Dream Machine Pro mit UnifiOS Version 3.x. Erfolgreich getestet mit UnifiOS 3.2.7 und Network App 8.0.26.
@@ -16,7 +16,7 @@ Das Script `udm-ipv6.sh` wird bei jedem Systemstart und anschließend alle 90 Se
 - Vergabe von IPv6-ULAs für die konfigurierten Netzwerke 
 
 ## Disclaimer
-Änderungen die dieses Script an der Konfiguration der UDM-Pro vornimmt, werden von Ubiquiti nicht offiziell unterstützt und können zu Fehlfunktionen oder Garantieverlust führen. Alle BAckup werden auf eigene Gefahr durchgeführt. Vor der Installation: Backup, Backup, Backup!!!
+Änderungen die dieses Script an der Konfiguration der UDM-Pro vornimmt, werden von Ubiquiti nicht offiziell unterstützt und können zu Fehlfunktionen oder Garantieverlust führen. Alle BAÄnderungenkup werden auf eigene Gefahr durchgeführt. Daher vor der Installation: Backup, Backup, Backup!!!
 
 
 ## Installation
@@ -72,7 +72,7 @@ exclude="br0"
 ######################################################################################
 ```
 
-Die Konfiguration kann auch in der Datei udm-wireguard.conf gespeichert werden, die bei einem Update nicht überschrieben wird.
+Die Konfiguration kann auch in der Datei udm-ipv6.conf gespeichert werden, die bei einem Update nicht überschrieben wird.
 
 **3. Einrichten der systemd-Services**
 
@@ -94,3 +94,10 @@ systemctl start udm-ipv6.timer
 systemctl status udm-ipv6.timer udm-ipv6.service
 ```
 
+## Update
+
+Das Script kann mit folgenden Befehlen aktualisiert werden:
+```
+cd /data/custom/ipv6
+git pull origin
+```
