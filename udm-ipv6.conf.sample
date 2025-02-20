@@ -1,0 +1,33 @@
+######################################################################################
+#
+# Configuration
+#
+
+# check and try to restore IPv6 connection
+check_v6=true
+
+# IPv6 hosts used to test IPv6 connection
+host1="facebook.de"
+host2="google.de"
+host3="apple.com"
+host4="microsoft.com"
+
+# list of WAN interfaces 
+# default for UDM Pro: 
+#	eht9 = primary WAN interface
+#	eht8 = secondary WAN interface
+wan_if="eth9 eth8"
+
+# List with ULAs that should be assigned to local interfaces
+# Each entry of the array must contain the interface name
+# followed by the ULA prefix that should be assigned.
+# Interface name and ULA prefix should be separated by a space.
+ula_list=(
+	"br0 fd00:0:0:0"
+	"br5 fd00:0:0:5"
+)
+
+#
+# No further changes should be necessary beyond this line.
+#
+######################################################################################

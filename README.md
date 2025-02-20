@@ -1,19 +1,22 @@
 # udm-ipv6
 IPv6 Workarounds für das UnifiOS der Ubiquiti Unifi Dream Machines Pro.
 
-Unique Local Addresses (ULA) können auch in unifiOS 3.2.7 und in Network App 8.0.36 immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
+Unique Local Addresses (ULA) können auch in unifiOS 4.1.13 und in Network App 9.0.114 immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
 
-Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jedem neuen IPv6-Prefix wurde das WAN interface nicht korrekt aktualisiert, so dass die IPv6-Verbindung verloren ging (siehe auch [UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe](https://nerdig.es/udm-pro-ipv6-2/)). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS 3.2.7 damit immer noch ein Problem hat. Um die IPv6 Verbindung nicht zu verlieren, wird regelmäßig überprüft ob die IPv6 Verbindung verloren geht. Falls ja, wird das WAN Interface resettet. Dadurch wird das neue IPv6-Prefix auch im Netzwerk verteilt und IPv6 sollte wieder funktionieren.
+Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6-Prefixen des Providers umgehen. Mit jedem neuen IPv6-Prefix wurde das WAN interface nicht korrekt aktualisiert, so dass die IPv6-Verbindung verloren ging (siehe auch [UDM Pro 1.x: Workaround für dynamische IPv6 Prefixe](https://nerdig.es/udm-pro-ipv6-2/)). Da mein Provider aktuell scheinbar die IPv6-Addresse nicht mehr so häufig aktualisiert, konnte ich noch nicht herausfinden ob UnifiOS >= 3.2.7 damit immer noch ein Problem hat. Um die IPv6 Verbindung nicht zu verlieren, wird regelmäßig überprüft ob die IPv6 Verbindung verloren geht. Falls ja, wird das WAN Interface resettet. Dadurch wird das neue IPv6-Prefix auch im Netzwerk verteilt und IPv6 sollte wieder funktionieren.
 
 ## Voraussetzungen
-Unifi Dream Machine Pro mit UnifiOS Version 3.x. Erfolgreich getestet mit UnifiOS 3.2.7 und Network App 8.0.26.
+
+ UnifiOS >= 1.x 
+ 
+ Erfolgreich getestet mit UnifiOS 4.1.13 und Network App 9.0.114.
 
 ## Funktionsweise
 Das Script `udm-ipv6.sh` wird bei jedem Systemstart und anschließend alle 90 Sekunden per systemd ausgeführt. Da die von Script erzeugten IPv6-ULAs bei Änderungen an der Netzwerkkonfiguration über die GUI wieder gelöscht werden, wird regelmäßig überprüft, ob die IPv6-ULAs noch passen. Neben dem systemd-Service wird daher auch ein systemd-Timer eingerichtet der das Script alle 90 Sekunden neu startet und die ULAs bei Bedarf wiederherstellt.
 
 ## Features
 - Überprüfung der IPv6-Verbindung  
-- Vergabe von IPv6-ULAs für die konfigurierten Netzwerke 
+- Vergabe von IPv6-ULAs für die konfigurierten interfaces 
 
 ## Disclaimer
 Änderungen die dieses Script an der Konfiguration der UDM-Pro vornimmt, werden von Ubiquiti nicht offiziell unterstützt und können zu Fehlfunktionen oder Garantieverlust führen. Alle BAÄnderungenkup werden auf eigene Gefahr durchgeführt. Daher vor der Installation: Backup, Backup, Backup!!!
@@ -50,18 +53,20 @@ host2="google.de"
 host3="apple.com"
 host4="microsoft.com"
 
-# set ULA on lan interfaces?
-lan_ula=true
+# list of WAN interfaces 
+# default for UDM Pro: 
+#	eht9 = primary WAN interface
+#	eht8 = secondary WAN interface
+wan_if="eth9 eth8"
 
-# set ULA on guest interfaces?
-guest_ula=false
-
-# ULA prefix to be used
-ula_prefix="fd00:2:0:"
-
-# interfaces listed in exclude will not be assigned any IPv6 ULAs
-# Multiple interfaces are to be separated by spaces.
-exclude="br0"
+# List with ULAs that should be assigned to local interfaces
+# Each entry of the array must contain the interface name
+# followed by the ULA prefix that should be assigned.
+# Interface name and ULA prefix should be separated by a space.
+ula_list=(
+	"br0 fd00:0:0:0"
+	"br5 fd00:0:0:5"
+)
 
 #
 # No further changes should be necessary beyond this line.
