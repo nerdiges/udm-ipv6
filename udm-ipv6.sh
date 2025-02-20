@@ -37,10 +37,8 @@ wan_if="eth9 eth8"
 # followed by the ULA prefix that should be assigned.
 # Interface name and ULA prefix should be separated by a space.
 ula_list=(
+	"br0 fd00:2:0:0"
 	"br5 fd00:2:0:5"
-	"br11 fd00:2:0:11"
-	"br12 fd00:2:0:12"
-	"br20 fd00:2:0:20"
 )
 
 #
