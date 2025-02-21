@@ -4,10 +4,10 @@
 #
 # Description:
 # ------------
-#       This script adds ULA addresses for selected interfaces in order to enable easy
-#       IPv6 firewall rule management when dynamic IPv6 prefixes are to be used.
+#	This script adds ULA addresses for selected interfaces in order to enable easy
+#	IPv6 firewall rule management when dynamic IPv6 prefixes are to be used.
 #	As IPv6 ULAs may be reseted whenever network config  is changed in GUI,
-#       this file should be executed regularly via systemd timer to ensure that  
+#	this file should be executed regularly via systemd timer to ensure that  
 #	firewall is permanently activated.
 #
 ######################################################################################

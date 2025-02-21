@@ -1,4 +1,9 @@
 # udm-ipv6
+> [!WARNING]
+> Bei einem Update von Version 0.1.x auf die aktuelle Version muss 
+> die Konfiguration angepasst werden. Die alte Konfiguration 
+> funktioniert nicht mehr.
+
 IPv6 Workarounds für das UnifiOS der Ubiquiti Unifi Dream Machines Pro.
 
 Unique Local Addresses (ULA) können auch in unifiOS 4.1.13 und in Network App 9.0.114 immer noch nicht vergeben werden. Auch wenn es nicht unbedingt als Best-Practice gilt ULAs zu verwenden, ist die Nutzung gerade bei dynamischen IPv6 Präfixes ggf. sinnvoll.
@@ -7,7 +12,7 @@ Außerdem konnte die UDM-Pro in der Vergangenheit nicht mit den dynamischen IPv6
 
 ## Voraussetzungen
 
- UnifiOS >= 1.x 
+ UnifiOS >= 2.x 
  
  Erfolgreich getestet mit UnifiOS 4.1.13 und Network App 9.0.114.
 
